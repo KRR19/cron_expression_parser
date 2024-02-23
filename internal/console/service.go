@@ -21,6 +21,30 @@ func New(parses cronparser.CronParser) *service {
 func (s *service) Run() {
 	fmt.Println("Running cron expression parser...")
 
+	s.readFromArgs()
+
+	s.readFromConsole()
+
+	fmt.Println("Quitting cron expression parser...")
+}
+
+func (s *service) readFromArgs() {
+	if len(os.Args) < 2 {
+		return
+	}
+
+	result, err := s.parses.Parse(os.Args[1])
+	if err != nil {
+		if err == cronparser.ErrInvalidExpression {
+			fmt.Println("Invalid expression. Please try again.")
+		}
+		return
+	}
+
+	s.printCronFields(result)
+}
+
+func (s *service) readFromConsole() {
 	for {
 		fmt.Println("Enter a cron expression in correct format.\nExample '*/15 0 1,15 * 1-5 /usr/bin/find'.\nPress 'q' to quit.")
 		input := s.readln()
@@ -37,10 +61,8 @@ func (s *service) Run() {
 			continue
 		}
 
-		printCronFields(result)
+		s.printCronFields(result)
 	}
-
-	fmt.Println("Quitting cron expression parser...")
 }
 
 func (s *service) readln() string {
@@ -51,22 +73,24 @@ func (s *service) readln() string {
 		log.Fatal(err)
 	}
 
-	return strings.TrimSpace(scanner.Text())
+	return strings.TrimFunc(strings.TrimSpace(scanner.Text()), func(r rune) bool {
+		return r == '"' || r == '\''
+	})
 }
 
-func printCronFields(fields *cronparser.CronFields) {
+func (s *service) printCronFields(fields *cronparser.CronFields) {
 	fmt.Println()
 
-	printArray("minute", fields.Minutes)
-	printArray("hour", fields.Hours)
-	printArray("day of month", fields.DayOfMonth)
-	printArray("month", fields.Month)
-	printArray("day of week", fields.DayOfWeek)
+	s.printArray("minute", fields.Minutes)
+	s.printArray("hour", fields.Hours)
+	s.printArray("day of month", fields.DayOfMonth)
+	s.printArray("month", fields.Month)
+	s.printArray("day of week", fields.DayOfWeek)
 
 	fmt.Printf("command       %s\n\n", fields.Command)
 }
 
-func printArray(name string, values []int) {
+func (s *service) printArray(name string, values []int) {
 	formattedValues := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(values)), " "), "[]")
 	fmt.Printf("%-14s %s\n", name, formattedValues)
 }
