@@ -1,7 +1,6 @@
 package cronparser
 
 type service struct {
-
 }
 
 func New() *service {
@@ -9,5 +8,8 @@ func New() *service {
 }
 
 func (s *service) Parse(expression string) (*CronFields, error) {
+	if !s.isValidCronExpression(expression) {
+		return nil, ErrInvalidExpression
+	}
 	return &CronFields{}, nil
 }

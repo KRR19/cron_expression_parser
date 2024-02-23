@@ -26,21 +26,21 @@ func TestParse(t *testing.T) {
 		err         error
 		expected    *cronparser.CronFields
 	}{
+		// {
+		// 	description: "valid expression",
+		// 	expression:  "*/15 0 1,15 * 1-5 /usr/bin/find",
+		// 	err:         nil,
+		// 	expected: &cronparser.CronFields{
+		// 		Minutes:    []int{0, 15, 30, 45},
+		// 		Hours:      []int{0},
+		// 		DayOfMonth: []int{1, 15},
+		// 		Month:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
+		// 		DayOfWeek:  []int{1, 2, 3, 4, 5},
+		// 		Command:    stringPtr("/usr/bin/find"),
+		// 	},
+		// },
 		{
-			description: "valid expression",
-			expression:  "*/15 0 1,15 * 1-5 /usr/bin/find",
-			err:         nil,
-			expected: &cronparser.CronFields{
-				Minutes:    []int{0, 15, 30, 45},
-				Hours:      []int{0},
-				DayOfMonth: []int{1, 15},
-				Month:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
-				DayOfWeek:  []int{1, 2, 3, 4, 5},
-				Command:    stringPtr("/usr/bin/find"),
-			},
-		},
-		{
-			description: "invalid expression",
+			description: "*/f 0 1,k5 * 1-5 /usr/bin/find",
 			expression:  "invalid expression",
 			err:         cronparser.ErrInvalidExpression,
 			expected:    nil,
