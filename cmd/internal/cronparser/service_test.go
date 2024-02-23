@@ -20,45 +20,63 @@ func newCronServiceConfig(t *testing.T) *cronServiceConfig {
 }
 
 func TestParse(t *testing.T) {
-	tests := []struct {
-		description string
-		expression  string
-		err         error
-		expected    *cronparser.CronFields
-	}{
-		// {
-		// 	description: "valid expression",
-		// 	expression:  "*/15 0 1,15 * 1-5 /usr/bin/find",
-		// 	err:         nil,
-		// 	expected: &cronparser.CronFields{
-		// 		Minutes:    []int{0, 15, 30, 45},
-		// 		Hours:      []int{0},
-		// 		DayOfMonth: []int{1, 15},
-		// 		Month:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
-		// 		DayOfWeek:  []int{1, 2, 3, 4, 5},
-		// 		Command:    stringPtr("/usr/bin/find"),
-		// 	},
-		// },
-		{
-			description: "*/f 0 1,k5 * 1-5 /usr/bin/find",
-			expression:  "invalid expression",
-			err:         cronparser.ErrInvalidExpression,
-			expected:    nil,
-		},
-		{
-			description: "empty expression",
-			expression:  "",
-			err:         cronparser.ErrInvalidExpression,
-			expected:    nil,
-		},
-	}
-
 	ctrl := newCronServiceConfig(t)
-	for _, test := range tests {
-		result, err := ctrl.service.Parse(test.expression)
-		assert.Error(t, test.err, err)
-		assert.Equal(t, test.expected, result)
-	}
+	t.Run("ValidExpression", func(t *testing.T) {
+		expression := "*/15 0 1,15 * 1-5 /usr/bin/find"
+		expected := &cronparser.CronFields{
+			Minutes:    []int{0, 15, 30, 45},
+			Hours:      []int{0},
+			DayOfMonth: []int{1, 15},
+			Month:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
+			DayOfWeek:  []int{1, 2, 3, 4, 5},
+			Command:    stringPtr("/usr/bin/find"),
+		}
+	
+		actual, err := ctrl.service.Parse(expression)
+	
+		assert.NoError(t, err)
+		assert.Equal(t, expected, actual)
+	})
+	t.Run("Partial written expression", func(t *testing.T) {
+		expression := "*/15 0 1,15 *"
+		actual, err := ctrl.service.Parse(expression)
+		assert.Error(t, cronparser.ErrInvalidExpression, err)
+		assert.Nil(t, actual)
+	})
+	
+	t.Run("Expression with to long command", func(t *testing.T) {
+		expression := "*/15 0 1,15 * 1-5 /usr/bin/find extended command"
+		expected := &cronparser.CronFields{
+			Minutes:    []int{0, 15, 30, 45},
+			Hours:      []int{0},
+			DayOfMonth: []int{1, 15},
+			Month:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
+			DayOfWeek:  []int{1, 2, 3, 4, 5},
+			Command:    stringPtr("/usr/bin/find extended command"),
+		}
+	
+		actual, err := ctrl.service.Parse(expression)
+	
+		assert.NoError(t, err)
+		assert.Equal(t, expected, actual)
+	})
+
+	t.Run("InvalidExpression", func(t *testing.T) {
+		expression := "*/f 0 1,k5 * 1-5 /usr/bin/find"
+
+		actual, err := ctrl.service.Parse(expression)
+	
+		assert.Error(t, cronparser.ErrInvalidExpression, err)
+		assert.Nil(t, actual)
+	})
+	t.Run("EmptyExpression", func(t *testing.T) {
+		expression := ""
+
+		actual, err := ctrl.service.Parse(expression)
+	
+		assert.Error(t, cronparser.ErrInvalidExpression, err)
+		assert.Nil(t, actual)
+	})
 }
 
 func stringPtr(s string) *string {
