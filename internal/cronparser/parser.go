@@ -4,8 +4,6 @@ import (
 	"log"
 	"strconv"
 	"strings"
-
-	"github.com/KRR19/cron_expression_parser/internal/pkg/utils"
 )
 
 func (s *service) parse(expression string) (*CronFields, error) {
@@ -23,7 +21,7 @@ func (s *service) parse(expression string) (*CronFields, error) {
 		DayOfMonth: dayOfMonth,
 		Month:      month,
 		DayOfWeek:  dayOfWeek,
-		Command:    utils.StringPtr(strings.Join(fields[5:], " ")),
+		Command:    strings.Join(fields[5:], " "),
 	}, nil
 }
 

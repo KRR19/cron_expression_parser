@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/KRR19/cron_expression_parser/internal/cronparser"
-	"github.com/KRR19/cron_expression_parser/internal/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +21,7 @@ func newCronServiceConfig(t *testing.T) *cronServiceConfig {
 
 func TestParse(t *testing.T) {
 	ctrl := newCronServiceConfig(t)
-	t.Run("ValidExpression", func(t *testing.T) {
+	t.Run("Valid expression", func(t *testing.T) {
 		expression := "*/15 0 1,15 * 1-5 /usr/bin/find"
 		expected := &cronparser.CronFields{
 			Minutes:    []int{0, 15, 30, 45},
@@ -30,7 +29,7 @@ func TestParse(t *testing.T) {
 			DayOfMonth: []int{1, 15},
 			Month:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
 			DayOfWeek:  []int{1, 2, 3, 4, 5},
-			Command:    utils.StringPtr("/usr/bin/find"),
+			Command:    "/usr/bin/find",
 		}
 
 		actual, err := ctrl.service.Parse(expression)
@@ -53,7 +52,23 @@ func TestParse(t *testing.T) {
 			DayOfMonth: []int{1, 15},
 			Month:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
 			DayOfWeek:  []int{1, 2, 3, 4, 5},
-			Command:    utils.StringPtr("/usr/bin/find extended command"),
+			Command:    "/usr/bin/find extended command",
+		}
+
+		actual, err := ctrl.service.Parse(expression)
+
+		assert.NoError(t, err)
+		assert.Equal(t, expected, actual)
+	})
+
+	t.Run("Expression without command", func(t *testing.T) {
+		expression := "*/15 0 1,15 * 1-5"
+		expected := &cronparser.CronFields{
+			Minutes:    []int{0, 15, 30, 45},
+			Hours:      []int{0},
+			DayOfMonth: []int{1, 15},
+			Month:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
+			DayOfWeek:  []int{1, 2, 3, 4, 5},
 		}
 
 		actual, err := ctrl.service.Parse(expression)

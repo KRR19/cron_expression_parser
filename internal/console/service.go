@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/KRR19/cron_expression_parser/cmd/internal/cronparser"
+	"github.com/KRR19/cron_expression_parser/internal/cronparser"
 )
 
 type Service struct {
@@ -23,7 +23,7 @@ func (s *Service) Run() {
 		var input string
 		fmt.Scanln(&input)
 		input = strings.TrimSpace(input)
-		if input == quitCommand{
+		if input == quitCommand {
 			break
 		}
 
