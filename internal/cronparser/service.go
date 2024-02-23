@@ -1,10 +1,5 @@
 package cronparser
 
-import (
-	"errors"
-	"strings"
-)
-
 type service struct {
 }
 
@@ -17,9 +12,9 @@ func (s *service) Parse(expression string) (*CronFields, error) {
 		return nil, ErrInvalidExpression
 	}
 
-	fields := strings.Fields(expression)
-	if len(fields) != 7 {
-		return nil, errors.New("invalid cron string format")
+	p, err := s.parse(expression)
+	if err != nil {
+		return nil, err
 	}
-	return &CronFields{}, nil
+	return p, nil
 }

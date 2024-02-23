@@ -3,7 +3,8 @@ package cronparser_test
 import (
 	"testing"
 
-	"github.com/KRR19/cron_expression_parser/cmd/internal/cronparser"
+	"github.com/KRR19/cron_expression_parser/internal/cronparser"
+	"github.com/KRR19/cron_expression_parser/internal/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,11 +30,11 @@ func TestParse(t *testing.T) {
 			DayOfMonth: []int{1, 15},
 			Month:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
 			DayOfWeek:  []int{1, 2, 3, 4, 5},
-			Command:    stringPtr("/usr/bin/find"),
+			Command:    utils.StringPtr("/usr/bin/find"),
 		}
-	
+
 		actual, err := ctrl.service.Parse(expression)
-	
+
 		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
@@ -43,7 +44,7 @@ func TestParse(t *testing.T) {
 		assert.Error(t, cronparser.ErrInvalidExpression, err)
 		assert.Nil(t, actual)
 	})
-	
+
 	t.Run("Expression with to long command", func(t *testing.T) {
 		expression := "*/15 0 1,15 * 1-5 /usr/bin/find extended command"
 		expected := &cronparser.CronFields{
@@ -52,11 +53,11 @@ func TestParse(t *testing.T) {
 			DayOfMonth: []int{1, 15},
 			Month:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
 			DayOfWeek:  []int{1, 2, 3, 4, 5},
-			Command:    stringPtr("/usr/bin/find extended command"),
+			Command:    utils.StringPtr("/usr/bin/find extended command"),
 		}
-	
+
 		actual, err := ctrl.service.Parse(expression)
-	
+
 		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
@@ -65,7 +66,7 @@ func TestParse(t *testing.T) {
 		expression := "*/f 0 1,k5 * 1-5 /usr/bin/find"
 
 		actual, err := ctrl.service.Parse(expression)
-	
+
 		assert.Error(t, cronparser.ErrInvalidExpression, err)
 		assert.Nil(t, actual)
 	})
@@ -73,12 +74,8 @@ func TestParse(t *testing.T) {
 		expression := ""
 
 		actual, err := ctrl.service.Parse(expression)
-	
+
 		assert.Error(t, cronparser.ErrInvalidExpression, err)
 		assert.Nil(t, actual)
 	})
-}
-
-func stringPtr(s string) *string {
-	return &s
 }

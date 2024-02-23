@@ -6,6 +6,5 @@ type CronFields struct {
     DayOfMonth  []int
     Month       []int
     DayOfWeek   []int
-    Year        []int
     Command     *string
 }
