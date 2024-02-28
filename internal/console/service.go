@@ -2,6 +2,7 @@ package console
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -55,7 +56,7 @@ func (s *service) readFromConsole() {
 
 		result, err := s.parses.Parse(input)
 		if err != nil {
-			if err == cronparser.ErrInvalidExpression {
+			if errors.Is(err, cronparser.ErrInvalidExpression) {
 				fmt.Println("Invalid expression. Please try again.")
 			}
 			continue
