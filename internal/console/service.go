@@ -36,7 +36,7 @@ func (s *service) readFromArgs() {
 
 	result, err := s.parses.Parse(os.Args[1])
 	if err != nil {
-		if err == cronparser.ErrInvalidExpression {
+		if errors.Is(err, cronparser.ErrInvalidExpression) {
 			fmt.Println("Invalid expression. Please try again.")
 		}
 		return
